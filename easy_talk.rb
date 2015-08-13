@@ -6,7 +6,7 @@ require 'uri'
 set :environment, :production
 
 class EasyTalk
-  def post(utt)
+  def post(utt,context="")
     uri = URI.parse("https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=#{ENV["APIKEY"]}")
     https = Net::HTTP.new(uri.host, uri.port)
     https.use_ssl = true
@@ -15,7 +15,7 @@ class EasyTalk
 
     payload = {
       utt: "#{utt}",
-      context: "",
+      context: "#{context}",
       nickname: "光",
       nickname_y: "ヒカリ",
       sex: "女",
@@ -38,4 +38,14 @@ end
   get '/' do
     easy_tolk = EasyTalk.new
     puts easy_tolk.post("元気ですか！？")
+  end
+
+  get '/index' do
+    erb :index
+  end
+
+  post '/new' do
+    easy_tolk = EasyTalk.new
+    response = easy_tolk.post("#{params[:in]}")
+    JSON.parse(response)["utt"]
   end
