@@ -35,9 +35,13 @@ class EasyTalk
   end
 end
 
-  get '/' do
+  post '/' do
     easy_tolk = EasyTalk.new
-    puts easy_tolk.post("元気ですか！？")
+    puts easy_tolk.post("#{params[:text]}")
+  end
+
+  post '/test' do
+    params
   end
 
   get '/index' do
