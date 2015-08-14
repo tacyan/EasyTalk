@@ -36,13 +36,18 @@ class EasyTalk
 end
 
   post '/' do
-    text = params[:text]
-    params[:user_id] ||= ""
-    text.slice!("#{params[:trigger_word] }") if params[:trigger_word]
-    easy_tolk = EasyTalk.new
-    response = easy_tolk.post("#{text}","#{params[:user_id]}")
-    res = JSON.parse(response)
-    { text: "#{res["utt"]}" }.to_json
+    begin
+      text = params[:text] ||= ""
+      params[:user_id] ||= ""
+      text.slice!("#{params[:trigger_word] }") if params[:trigger_word]
+      easy_tolk = EasyTalk.new
+      response = easy_tolk.post("#{text}","#{params[:user_id]}")
+      res = JSON.parse(response)
+      { text: "#{res["utt"]}" }.to_json
+    rescue JSON::ParserError => e
+      { text: "..." }.to_json
+    rescue NoMethodError => e
+      { text: "..." }.to_json
   end
 
   get '/index' do
@@ -50,9 +55,15 @@ end
   end
 
   post '/new' do
-    params[:context] ||= ""
-    easy_tolk = EasyTalk.new
-    response = easy_tolk.post("#{params[:utt]}",params[:context])
-    res = JSON.parse(response)
-    { utt: "#{res["utt"]}", context: "#{res["context"]}" }.to_json
+    begin
+      params[:context] ||= ""
+      easy_tolk = EasyTalk.new
+      response = easy_tolk.post("#{params[:utt]}",params[:context])
+      res = JSON.parse(response)
+      { utt: "#{res["utt"]}", context: "#{res["context"]}" }.to_json
+    rescue JSON::ParserError => e
+      { utt: "..." }.to_json
+    rescue NoMethodError => e
+      { utt: "..." }.to_json
+    end
   end
