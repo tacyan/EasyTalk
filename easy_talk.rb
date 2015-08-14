@@ -37,9 +37,10 @@ end
 
   post '/' do
     text = params[:text]
+    params[:user_id] ||= ""
     text.slice!("#{params[:trigger_word] }") if params[:trigger_word]
     easy_tolk = EasyTalk.new
-    response = easy_tolk.post("#{text}")
+    response = easy_tolk.post("#{text}","#{params[:user_id]}")
     res = JSON.parse(response)
     { text: "#{res["utt"]}" }.to_json
   end
