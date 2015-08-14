@@ -37,11 +37,8 @@ end
 
   post '/' do
     easy_tolk = EasyTalk.new
-    puts easy_tolk.post("#{params[:text]}")
-  end
-
-  post '/test' do
-    params
+    res = easy_tolk.post("#{params[:text]}")
+    { text: res["utt"] }.to_json
   end
 
   get '/index' do
