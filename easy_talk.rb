@@ -45,7 +45,9 @@ end
   end
 
   post '/new' do
+    params[:context] ||= ""
     easy_tolk = EasyTalk.new
-    response = easy_tolk.post("#{params[:in]}")
-    JSON.parse(response)["utt"]
+    response = easy_tolk.post("#{params[:utt]}",params[:context])
+    res = JSON.parse(response)
+    { utt: "#{res["utt"]}", context: "#{res["context"]}" }.to_json
   end
