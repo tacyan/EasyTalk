@@ -37,7 +37,8 @@ end
 
   post '/' do
     easy_tolk = EasyTalk.new
-    res = easy_tolk.post("#{params[:text]}")
+    response = easy_tolk.post("#{params[:text]}")
+    res = JSON.parse(response)
     { text: "#{res["utt"]}" }.to_json
   end
 
