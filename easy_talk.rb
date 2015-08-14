@@ -48,6 +48,7 @@ end
       { text: "..." }.to_json
     rescue NoMethodError => e
       { text: "..." }.to_json
+    end
   end
 
   get '/index' do
