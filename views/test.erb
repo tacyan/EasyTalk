@@ -1,0 +1,48 @@
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
+  <!-- Compiled and minified JavaScript -->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
+
+  <script>
+    $(document).ready(function(){
+      $('.parallax').parallax();
+    });
+  </script>
+
+  <div class="parallax-container">
+    <div class="row center"><h1 class="col s12 light white-text">さぁはじめよう！</h1></div>
+    <div class="parallax"><img src="http://materializecss.com/images/parallax1.jpg"></div>
+  </div>
+
+<div class="section white">
+  <div class="row container">
+    <h2 class="header">DoCoMo</h2>
+    <p class="grey-text text-darken-3 lighten-3">DoCoMoの雑談APIと簡単に喋る事が出来ます。</p>
+    <span id="result_span"></span>
+
+    <div class="content" id=""></div>
+
+    <input type="text" id="input_text" placeholder="Message"><br /><br />
+
+    <script>
+      $('#input_text').keydown(function (e) {
+        var content = $("#input_text").val();
+        if (content && content !== "") {
+          if (e.which == 13){
+            $.post('/new', { utt: $('#input_text').val(), context: document.getElementsByClassName('test').id }, function(ret) {
+              var response = JSON.parse(ret);
+              var element = document.getElementsByClassName('test');
+              element.id = response.context
+              $('#result_span').before('<div class="question_Box"><div class="question_image"><img src="http://flat-icon-design.com/f/f_object_174/s256_f_object_174_0bg.png" alt="質問者の写真" /></div><div class="arrow_question">'+$('#input_text').val()+'</div></div>');
+              $('#result_span').before('<div class="question_Box"><div class="answer_image"><img src="http://flat-icon-design.com/f/f_event_63/s256_f_event_63_0bg.png" alt="雑談APIの写真" /></div><div class="arrow_answer">'+ response.utt +'</div></div>');
+              $('body').animate({
+                scrollTop: $(document).height()
+              },1);
+            });
+          }
+        }
+      });
+    </script>
+  </div>
+</div>

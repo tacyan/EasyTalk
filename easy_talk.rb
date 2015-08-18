@@ -26,7 +26,11 @@ class EasyTalk
       age: "16",
       constellations: "双子座",
       place: "東京",
-      mode: "dialog"
+      mode: "dialog",
+      t: "20"
+#指定無し　デフォルト
+#20  関西弁
+#30  赤ちゃん
     }.to_json
 
     req.body = payload
@@ -49,6 +53,10 @@ end
     rescue NoMethodError => e
       { text: "..." }.to_json
     end
+  end
+
+  get '/test' do
+    erb :test
   end
 
   get '/index' do
