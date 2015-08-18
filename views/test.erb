@@ -40,10 +40,12 @@
         var content = $("#textarea1").val();
         if (content && content !== "") {
           if (e.which == 13){
-            $.post('/new', { utt: $('#textarea1').val(), context: document.getElementsByClassName('test').id }, function(ret) {
+            $.post('/new', { utt: $('#textarea1').val(), context: document.getElementsByClassName('test').id, mode: document.getElementsByClassName('test').mode }, function(ret) {
               var response = JSON.parse(ret);
+              //一時的に使用するidなどをダミーで作る
               var element = document.getElementsByClassName('test');
               element.id = response.context
+              element.mode = response.mode
               $('#result_span').before('<div class="question_Box"><div class="question_image"><img src="http://flat-icon-design.com/f/f_object_174/s256_f_object_174_0bg.png" alt="質問者の写真" /></div><div class="arrow_question">'+$('#textarea1').val()+'</div></div>');
               $('#result_span').before('<div class="question_Box"><div class="answer_image"><img src="http://flat-icon-design.com/f/f_event_63/s256_f_event_63_0bg.png" alt="雑談APIの写真" /></div><div class="arrow_answer">'+ response.utt +'</div></div>');
               $('#textarea1').val('');

@@ -6,7 +6,7 @@ require 'uri'
 set :environment, :production
 
 class EasyTalk
-  def post(utt,context="")
+  def post(utt,context="",mode="",t="20")
     uri = URI.parse("https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=#{ENV["APIKEY"]}")
     https = Net::HTTP.new(uri.host, uri.port)
     https.use_ssl = true
@@ -14,8 +14,8 @@ class EasyTalk
     req["Content-Type"] = "application/json"
 
     payload = {
-      utt: "#{utt}",
-      context: "#{context}",
+      utt: utt,
+      context: context,
       nickname: "光",
       nickname_y: "ヒカリ",
       sex: "女",
@@ -26,8 +26,8 @@ class EasyTalk
       age: "16",
       constellations: "双子座",
       place: "東京",
-      mode: "dialog",
-      t: "20"
+      mode: mode,
+      t: t
 #指定無し　デフォルト
 #20  関西弁
 #30  赤ちゃん
@@ -43,15 +43,15 @@ end
     begin
       text = params[:text] ||= ""
       params[:user_id] ||= ""
-      text.slice!("#{params[:trigger_word] }") if params[:trigger_word]
+      text.slice!(params[:trigger_word]) if params[:trigger_word]
       easy_tolk = EasyTalk.new
-      response = easy_tolk.post("#{text}","#{params[:user_id]}")
+      response = easy_tolk.post(text,params[:user_id])
       res = JSON.parse(response)
-      { text: "#{res["utt"]}" }.to_json
+      { text: res["utt"] }.to_json
     rescue JSON::ParserError => e
-      { text: "..." }.to_json
+      { text: ".........................................." }.to_json
     rescue NoMethodError => e
-      { text: "..." }.to_json
+      { text: ".........................................." }.to_json
     end
   end
 
@@ -67,9 +67,8 @@ end
     begin
       params[:context] ||= ""
       easy_tolk = EasyTalk.new
-      response = easy_tolk.post("#{params[:utt]}",params[:context])
-      res = JSON.parse(response)
-      { utt: "#{res["utt"]}", context: "#{res["context"]}" }.to_json
+      response = easy_tolk.post(params[:utt],params[:context],params[:mode])
+      res = JSON.parse(response).to_json
     rescue JSON::ParserError => e
       { utt: "..." }.to_json
     rescue NoMethodError => e
