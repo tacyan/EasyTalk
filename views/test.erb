@@ -1,8 +1,10 @@
   <!-- Compiled and minified CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <!-- Compiled and minified JavaScript -->
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
+
 
   <script>
     $(document).ready(function(){
@@ -23,19 +25,28 @@
 
     <div class="content" id=""></div>
 
-    <input type="text" id="input_text" placeholder="Message"><br /><br />
+    <div class="row">
+      <div class="input-field col s12">
+        <textarea id="textarea1" class="materialize-textarea"></textarea>
+        <label for="textarea1">EnterでMessageを投稿します。</label>
+        <button class="btn waves-effect waves-light" onClick="$('#textarea1').trigger($.Event('keydown',{ keyCode: 13, which: 13 }))">Send
+          <i class="material-icons">send</i>
+        </button>
+      </div>
+    </div>
 
     <script>
-      $('#input_text').keydown(function (e) {
-        var content = $("#input_text").val();
+      $('#textarea1').keydown(function (e) {
+        var content = $("#textarea1").val();
         if (content && content !== "") {
           if (e.which == 13){
-            $.post('/new', { utt: $('#input_text').val(), context: document.getElementsByClassName('test').id }, function(ret) {
+            $.post('/new', { utt: $('#textarea1').val(), context: document.getElementsByClassName('test').id }, function(ret) {
               var response = JSON.parse(ret);
               var element = document.getElementsByClassName('test');
               element.id = response.context
-              $('#result_span').before('<div class="question_Box"><div class="question_image"><img src="http://flat-icon-design.com/f/f_object_174/s256_f_object_174_0bg.png" alt="質問者の写真" /></div><div class="arrow_question">'+$('#input_text').val()+'</div></div>');
+              $('#result_span').before('<div class="question_Box"><div class="question_image"><img src="http://flat-icon-design.com/f/f_object_174/s256_f_object_174_0bg.png" alt="質問者の写真" /></div><div class="arrow_question">'+$('#textarea1').val()+'</div></div>');
               $('#result_span').before('<div class="question_Box"><div class="answer_image"><img src="http://flat-icon-design.com/f/f_event_63/s256_f_event_63_0bg.png" alt="雑談APIの写真" /></div><div class="arrow_answer">'+ response.utt +'</div></div>');
+              $('#textarea1').val('');
               $('body').animate({
                 scrollTop: $(document).height()
               },1);
