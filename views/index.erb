@@ -52,8 +52,12 @@
               var element = document.getElementsByClassName('test');
               element.id = response.context
               element.mode = response.mode
+              console.log(chara.value);
               switch (chara.value){
                 case undefined:
+                  chara.img = "http://ngt.idc.nttdocomo.co.jp/character/img/pickup/pickup_img01.jpg"
+                  break;
+                case "":
                   chara.img = "http://ngt.idc.nttdocomo.co.jp/character/img/pickup/pickup_img01.jpg"
                   break;
                 case 20:
