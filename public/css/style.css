@@ -47,13 +47,16 @@
 .question_image {
     float: left;
     width:20%;
+    border-radius: 100%;
 }
 .answer_image {
     float: right;
     width:20%;
+    border-radius: 100%;
 }
 .answer_image img,.question_image img {
     width: 100%;
+    border-radius: 100%;
 }
 .question_Box {
     margin-bottom: 25px;

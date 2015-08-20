@@ -43,16 +43,29 @@
 
       $('#textarea1').keydown(function (e) {
         var content = $("#textarea1").val();
-        if (content && content !== "") {
+        if (content !== "") {
           if (e.which == 13){
-            $.post('/new', { utt: $('#textarea1').val(), context: document.getElementsByClassName('test').id, mode: document.getElementsByClassName('test').mode, t: document.getElementsByClassName('chara').value }, function(ret) {
+            var chara = document.getElementsByClassName('chara');
+            $.post('/new', { utt: $('#textarea1').val(), context: document.getElementsByClassName('test').id, mode: document.getElementsByClassName('test').mode, t: chara.value }, function(ret) {
               var response = JSON.parse(ret);
               //一時的に使用するidなどをダミーで作る
               var element = document.getElementsByClassName('test');
               element.id = response.context
               element.mode = response.mode
-              $('#result_span').before('<div class="question_Box"><div class="question_image"><img src="http://flat-icon-design.com/f/f_object_174/s256_f_object_174_0bg.png" alt="質問者の写真" /></div><div class="arrow_question">'+$('#textarea1').val()+'</div></div>');
-              $('#result_span').before('<div class="question_Box"><div class="answer_image"><img src="http://flat-icon-design.com/f/f_event_63/s256_f_event_63_0bg.png" alt="雑談APIの写真" /></div><div class="arrow_answer">'+ response.utt +'</div></div>');
+              switch (chara.value){
+                case undefined:
+                  chara.img = "http://ngt.idc.nttdocomo.co.jp/character/img/pickup/pickup_img01.jpg"
+                  break;
+                case 20:
+                  chara.img = "http://ngt.idc.nttdocomo.co.jp/character/img/prize01.jpg"
+                  break;
+                case 30:
+                  chara.img = "http://ngt.idc.nttdocomo.co.jp/character/img/prize02.jpg"
+                  break;
+              }
+              var self_chara_img = "http://www.moaibu.com/chara/etc2/docomodake.jpg"
+              $('#result_span').before('<div class="question_Box"><div class="question_image"><img src='+ self_chara_img +' alt="ドコモダケ" /></div><div class="arrow_question">'+$('#textarea1').val()+'</div></div>');
+              $('#result_span').before('<div class="question_Box"><div class="answer_image"><img src='+ chara.img +' alt="雑談API" /></div><div class="arrow_answer">'+ response.utt +'</div></div>');
               $('#textarea1').val('');
               $('body').animate({
                 scrollTop: $(document).height()
