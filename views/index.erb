@@ -5,22 +5,21 @@
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
 
-
-  <script>
-    $(document).ready(function(){
-      $('.parallax').parallax();
-    });
-  </script>
-
   <div class="parallax-container">
     <div class="row center"><h1 class="col s12 light white-text">さぁはじめよう！</h1></div>
     <div class="parallax"><img src="http://materializecss.com/images/parallax1.jpg"></div>
   </div>
 
-<div class="section white">
-  <div class="row container">
-    <h2 class="header">DoCoMo</h2>
-    <p class="grey-text text-darken-3 lighten-3">DoCoMoの雑談APIと簡単に喋る事が出来ます。</p>
+  <div class="row">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3" onclick="character_set('')"><a class="active" href="#test1">ゼロ</a></li>
+        <li class="tab col s3" onclick="character_set(20)"><a href="#test2">桜子</a></li>
+        <li class="tab col s3" onclick="character_set(30)"><a href="#test3">ハヤテ</a></li>
+      </ul>
+    </div>
+  </div>
+
     <span id="result_span"></span>
 
     <div class="content" id=""></div>
@@ -32,15 +31,21 @@
         <button class="btn waves-effect waves-light" onClick="$('#textarea1').trigger($.Event('keydown',{ keyCode: 13, which: 13 }))">Send
           <i class="material-icons">send</i>
         </button>
+        <input type="hidden" id="character_type" value=""></div>
       </div>
     </div>
 
     <script>
+      $(document).ready(function(){
+        $('.parallax').parallax();
+        $('ul.tabs').tabs();
+      });
+
       $('#textarea1').keydown(function (e) {
         var content = $("#textarea1").val();
         if (content && content !== "") {
           if (e.which == 13){
-            $.post('/new', { utt: $('#textarea1').val(), context: document.getElementsByClassName('test').id, mode: document.getElementsByClassName('test').mode }, function(ret) {
+            $.post('/new', { utt: $('#textarea1').val(), context: document.getElementsByClassName('test').id, mode: document.getElementsByClassName('test').mode, t: document.getElementsByClassName('chara').value }, function(ret) {
               var response = JSON.parse(ret);
               //一時的に使用するidなどをダミーで作る
               var element = document.getElementsByClassName('test');
@@ -56,6 +61,11 @@
           }
         }
       });
+
+      function character_set(value){
+        var character_type = document.getElementsByClassName('chara');
+        character_type.value = value;
+      }
     </script>
   </div>
 </div>

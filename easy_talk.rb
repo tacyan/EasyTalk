@@ -67,11 +67,11 @@ end
     begin
       params[:context] ||= ""
       easy_tolk = EasyTalk.new
-      response = easy_tolk.post(params[:utt],params[:context],params[:mode])
+      response = easy_tolk.post(params[:utt],params[:context],params[:mode],params[:t])
       res = JSON.parse(response).to_json
     rescue JSON::ParserError => e
-      { utt: "..." }.to_json
+      { utt: ".........................................." }.to_json
     rescue NoMethodError => e
-      { utt: "..." }.to_json
+      { utt: ".........................................." }.to_json
     end
   end
