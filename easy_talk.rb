@@ -3,6 +3,27 @@ require 'json'
 require 'net/http'
 require 'uri'
 
+
+#    payload = {
+#      utt: utt,
+#      context: context,
+#      nickname: "光",
+#      nickname_y: "ヒカリ",
+#      sex: "女",
+#      bloodtype: "B",
+#      birthdateY: "1997",
+#      birthdateM: "5",
+#      birthdateD: "30",
+#      age: "16",
+#      constellations: "双子座",
+#      place: "東京",
+#      mode: mode,
+#      t: t
+#指定無し　デフォルト
+#20  関西弁
+#30  赤ちゃん
+#    }.to_json
+
 set :environment, :production
 
 class EasyTalk
@@ -16,16 +37,6 @@ class EasyTalk
     payload = {
       utt: utt,
       context: context,
-      nickname: "光",
-      nickname_y: "ヒカリ",
-      sex: "女",
-      bloodtype: "B",
-      birthdateY: "1997",
-      birthdateM: "5",
-      birthdateD: "30",
-      age: "16",
-      constellations: "双子座",
-      place: "東京",
       mode: mode,
       t: t
 #指定無し　デフォルト
