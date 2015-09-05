@@ -90,7 +90,7 @@ end
       easy_tolk = EasyTalk.new
       response = easy_tolk.slack(text,params[:user_id])
       res = JSON.parse(response)
-      { text: res["utt"] }.to_json
+      { text: res["utt"] }
     rescue JSON::ParserError => e
       { text: ".........................................." }.to_json
     rescue NoMethodError => e
