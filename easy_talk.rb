@@ -3,8 +3,8 @@ require 'json'
 require 'net/http'
 require 'uri'
 require 'easy_translate'
-require 'kconv'
-
+require 'openssl'
+require 'rexml/document'
 
 #    payload = {
 #      utt: utt,
@@ -83,9 +83,128 @@ class EasyTalk
     res.body
   end
 
-  def translation
-     EasyTranslate.translate('Hello, world', :to => :japanese).tosjis
+#  def translation
+#     EasyTranslate.translate('Hello, world', :to => :japanese).tosjis
+#  end
+
+end
+
+class Translation
+  # プライマリアカウントキー see: https://datamarket.azure.com/account
+  MS_TRANSLATOR_PRIMARY_KEY      = "#{ENV["MS_TRANSLATOR_PRIMARY_KEY"]}"
+  # クライアントID see: https://datamarket.azure.com/developer/applications/
+  MS_TRANSLATOR_CLIENT_ID        = "#{ENV["MS_TRANSLATOR_CLIENT_ID"]}"
+  # クライアントID see: 顧客の秘密
+  MS_TRANSLATOR_CLIENT_SECRET    = "#{ENV["MS_TRANSLATOR_CLIENT_SECRET"]}"
+  MS_TRANSLATOR_ACCESSTOKEN_URL  = "#{ENV["MS_TRANSLATOR_ACCESSTOKEN_URL"]}"
+  MS_TRANSLATOR_SCOPE            = "#{ENV["MS_TRANSLATOR_SCOPE"]}"
+  MS_TRANSLATOR_URL              = "#{ENV["MS_TRANSLATOR_URL"]}"
+  MS_TRANSLATOR_GRANT_TYPE       = "#{ENV["MS_TRANSLATOR_GRANT_TYPE"]}"
+
+  def initialize
+    @cache = {}
+  end 
+
+  # POSTしてアクセストークンを取得する
+  def getAccessTokenMessage
+    response = nil 
+
+    Net::HTTP.version_1_2
+    uri = URI.parse(MS_TRANSLATOR_ACCESSTOKEN_URL)
+    https = Net::HTTP.new(uri.host, uri.port)
+    https.use_ssl = true
+    https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    request = Net::HTTP::Post.new(uri.path)
+    request.set_form_data({
+      :client_id => MS_TRANSLATOR_CLIENT_ID,
+      :client_secret => MS_TRANSLATOR_CLIENT_SECRET,
+      :scope => MS_TRANSLATOR_SCOPE,
+      :grant_type => MS_TRANSLATOR_GRANT_TYPE
+      })  
+
+    response = https.request(request)
+
+    if response.message == "OK"
+      @updateTime = Time.now
+      JSON.parse(response.body)
+    else
+      raise "access token acquisition failure"
+    end 
+
   end
+
+  # キャッシュから、もしくはPOSTしてアクセストークンを取得する
+  def getAccessToken(renew = false)
+    renewJson = true
+
+    if(@updateTime && @expiresIn)
+      delta = Time.now - @updateTime
+      if(delta <= @expiresIn.to_i - 10)
+        renewJson = false
+      end
+    end
+
+    if(renew)
+     renewJson = true
+    end
+
+    # puts "info: renew access token" if renewJson
+    @jsonResult = getAccessTokenMessage if renewJson
+    @accessToken = @jsonResult["access_token"]
+    @expiresIn = @jsonResult["expires_in"]
+
+    return @accessToken
+  end
+
+  def existsTransCache(word)
+    @cache.has_key?(word)
+  end
+
+  def setTransCache(word, resultWord)
+    @cache[word] = resultWord
+  end
+
+  def getTransCache(word)
+    @cache[word]
+  end
+
+  # wordを翻訳する
+  def trans(word)
+    if existsTransCache(word)
+      return getTransCache(word)
+    end
+    access_token = getAccessToken
+
+    Net::HTTP.version_1_2
+    uri = URI.parse(MS_TRANSLATOR_URL)
+    http = Net::HTTP.new(uri.host, uri.port)
+        params = {
+      :text => word,
+      :from => "en",
+      :to => "ja"
+      }
+    query_string = params.map{ |k,v|
+      URI.encode(k.to_s) + "=" + URI.encode(v.to_s)
+    }.join("&")
+
+    request = Net::HTTP::Get.new(uri.path + "?" + query_string)
+    request['Authorization'] = "Bearer #{access_token}"
+
+    response = http.request(request)
+
+    result = nil
+    # response.body
+    # => <string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">サンプル</string>
+    if response.message == "OK"
+      document = REXML::Document.new(response.body)
+      result = document.root.text
+      setTransCache(word, result)
+    end
+
+    result
+  end
+#
 end
 
   post '/slack' do
@@ -105,8 +224,13 @@ end
   end
 
   post '/translation' do
-    easy_tolk = EasyTalk.new
-    easy_tolk.translation
+    text = params[:text]
+    honyaku = Translation.new
+    honyaku.trans("#{text}").to_s
+  end
+
+  post '/honyaku' do
+    p params
   end
 
   post '/docomo' do
