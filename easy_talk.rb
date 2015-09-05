@@ -2,6 +2,8 @@ require 'sinatra'
 require 'json'
 require 'net/http'
 require 'uri'
+require 'easy_translate'
+require 'kconv'
 
 
 #    payload = {
@@ -80,6 +82,10 @@ class EasyTalk
     res = https.request(req)
     res.body
   end
+
+  def translation
+     EasyTranslate.translate('Hello, world', :to => :japanese).tosjis
+  end
 end
 
   post '/slack' do
@@ -96,6 +102,11 @@ end
     rescue NoMethodError => e
       { text: ".........................................." }.to_json
     end
+  end
+
+  post '/translation' do
+    easy_tolk = EasyTalk.new
+    easy_tolk.translation
   end
 
   post '/docomo' do
