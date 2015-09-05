@@ -209,11 +209,13 @@ end
 
   post '/slack' do
     begin
-      text = params[:text] ||= ""
-      params[:user_id] ||= ""
-      text.slice!(params[:trigger_word]) if params[:trigger_word]
+      body = request.body.read
+      params = JSON.parse(body)
+      text = params["text"] ||= ""
+      params["user_id"] ||= ""
+      text.slice!(params[:trigger_word]) if params["trigger_word"]
       easy_tolk = EasyTalk.new
-      response = easy_tolk.slack(text,params[:user_id])
+      response = easy_tolk.slack(text,params["user_id"])
       res = JSON.parse(response)
       res["utt"].to_s
     rescue JSON::ParserError => e
@@ -224,16 +226,16 @@ end
   end
 
   post '/translation' do
-    text = params[:text]
+    body = request.body.read
+    params = JSON.parse(body)
+    text = params["text"]
     honyaku = Translation.new
     honyaku.trans("#{text}").to_s
   end
 
-  post '/honyaku' do
-    p params
-  end
-
   post '/docomo' do
+    body = request.body.read
+    params = JSON.parse(body)
     easy_tolk = EasyTalk.new
     response = easy_tolk.docomo(params)
     res = JSON.parse(response)
