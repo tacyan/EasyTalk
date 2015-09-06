@@ -170,7 +170,7 @@ class Translation
   end
 
   # wordを翻訳する
-  def trans(word)
+  def trans(word,from="ja",to="en")
     if existsTransCache(word)
       return getTransCache(word)
     end
@@ -181,8 +181,8 @@ class Translation
     http = Net::HTTP.new(uri.host, uri.port)
         params = {
       :text => word,
-      :from => "en",
-      :to => "ja"
+      :from => from,
+      :to => to
       }
     query_string = params.map{ |k,v|
       URI.encode(k.to_s) + "=" + URI.encode(v.to_s)
@@ -229,8 +229,10 @@ end
     body = request.body.read
     params = JSON.parse(body)
     text = params["text"]
+    from = params["from"]
+    to = params["to"]
     honyaku = Translation.new
-    honyaku.trans("#{text}").to_s
+    honyaku.trans("#{text}","#{from}","#{to}").to_s
   end
 
   post '/docomo' do
