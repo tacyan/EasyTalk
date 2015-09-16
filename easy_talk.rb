@@ -5,6 +5,7 @@ require 'uri'
 require 'easy_translate'
 require 'openssl'
 require 'rexml/document'
+require 'rqrcode_png'
 
 #    payload = {
 #      utt: utt,
@@ -242,6 +243,16 @@ end
     response = easy_tolk.docomo(params)
     res = JSON.parse(response)
     res.to_json
+  end
+
+  post '/qr' do
+    body = request.body.read
+    params = JSON.parse(body)
+    qr = RQRCode::QRCode.new( "#{params["qrcode"]}", :size => 4, :level => :h )
+    png = qr.to_img
+    file = png.resize(400, 400).save("#{params["filename"]}.png")
+    content_type :png
+    send_file "#{params["filename"]}.png"
   end
 
   get '/test' do
